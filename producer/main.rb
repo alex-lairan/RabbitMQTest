@@ -5,11 +5,10 @@ conn = Bunny.new
 conn.start
 
 ch = conn.create_channel
-q  = ch.queue('bunny.examples.hello_world', auto_delete: true)
-x  = ch.default_exchange
+x  = ch.fanout('bunny.examples.hello_world')
 
-5.times do |i|
-  x.publish("Message #{i} - #{q.name}", routing_key: q.name)
+%w(ceci est un message en plusieurs parties).each do |i|
+  x.publish("Message #{i}")
 end
 
 conn.close

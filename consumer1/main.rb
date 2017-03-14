@@ -5,11 +5,16 @@ conn = Bunny.new
 conn.start
 
 ch = conn.create_channel
-q  = ch.queue('bunny.examples.hello_world', auto_delete: true)
+x  = ch.fanout('bunny.examples.hello_world')
+q  = ch.queue('', exclusive: true)
 
-q.subscribe block: true do |_delivery_info, _metadata, payload|
-  puts "Received #{payload}"
+q.bind(x)
+
+begin
+  q.subscribe block: true do |_delivery_info, _metadata, payload|
+    puts "Received #{payload}"
+  end
+rescue Interrupt
+  ch.close
+  conn.close
 end
-
-sleep 1.0
-conn.close
