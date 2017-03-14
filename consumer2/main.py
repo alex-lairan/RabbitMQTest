@@ -8,13 +8,15 @@ connection = pika.BlockingConnection(pika.ConnectionParameters(
 channel = connection.channel()
 
 channel.exchange_declare(exchange=ex_name,
-                         type='fanout')
+                         type='topic',
+                         auto_delete=True)
 
 result = channel.queue_declare(exclusive=True)
 queue_name = result.method.queue
 
 channel.queue_bind(exchange=ex_name,
-                   queue=queue_name)
+                   queue=queue_name,
+                   routing_key='demo.*')
 
 print(' [*] Waiting for logs. To exit press CTRL+C')
 
